@@ -21,7 +21,7 @@ class LocalCatFactsGenerator(
      * обернутую в подходящий стрим(Flowable/Single/Observable и т.п)
      */
     fun generateCatFact(): Single<Fact> {
-        val fact = Fact(facts[Random.nextInt(facts.size)])
+        val fact = Fact(listOf(facts[Random.nextInt(facts.size)]))
         return Single.create { emitter ->
             emitter.onSuccess(fact)
         }
@@ -34,12 +34,12 @@ class LocalCatFactsGenerator(
      */
 
     fun generateCatFactPeriodically(): Observable<Fact> {
-        var oldFact = Fact(facts[Random.nextInt(facts.size)])
+        var oldFact = Fact(listOf(facts[Random.nextInt(facts.size)]))
         return Observable.interval(DELAY_TIMEOUT, TimeUnit.MILLISECONDS, Schedulers.io())
             .map {
                 var randomFact = oldFact
                 while (randomFact == oldFact) {
-                    randomFact = Fact(facts[Random.nextInt(facts.size)])
+                    randomFact = Fact(listOf(facts[Random.nextInt(facts.size)]))
                 }
                 oldFact = randomFact
                 randomFact
