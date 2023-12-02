@@ -3,7 +3,6 @@ package otus.homework.reactivecats
 import android.content.Context
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 import kotlin.random.Random
 
@@ -22,9 +21,7 @@ class LocalCatFactsGenerator(
      */
     fun generateCatFact(): Single<Fact> {
         val fact = Fact(listOf(facts[Random.nextInt(facts.size)]))
-        return Single.create { emitter ->
-            emitter.onSuccess(fact)
-        }
+        return Single.just(fact)
     }
 
     /**
@@ -34,19 +31,9 @@ class LocalCatFactsGenerator(
      */
 
     fun generateCatFactPeriodically(): Observable<Fact> {
-        var oldFact = Fact(listOf(facts[Random.nextInt(facts.size)]))
-        return Observable.interval(DELAY_TIMEOUT, TimeUnit.MILLISECONDS, Schedulers.io())
+        return Observable.interval(2000L, TimeUnit.MILLISECONDS)
             .map {
-                var randomFact = oldFact
-                while (randomFact == oldFact) {
-                    randomFact = Fact(listOf(facts[Random.nextInt(facts.size)]))
-                }
-                oldFact = randomFact
-                randomFact
-            }
-    }
-
-    companion object{
-        private const val DELAY_TIMEOUT = 2000L
+                Fact(listOf(facts[Random.nextInt(facts.size)]))
+            }.distinctUntilChanged()
     }
 }
